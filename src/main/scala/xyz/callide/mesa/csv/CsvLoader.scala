@@ -49,6 +49,7 @@ object CsvLoader {
     val settings = new CsvParserSettings()
     settings.getFormat.setDelimiter(delimiter)
     settings.setUnescapedQuoteHandling(UnescapedQuoteHandling.STOP_AT_CLOSING_QUOTE)
+    settings.setMaxCharsPerColumn(65536)
 
     val parser = new com.univocity.parsers.csv.CsvParser(settings)
     read(parser.iterate(stream).iterator())
@@ -68,6 +69,7 @@ object CsvLoader {
     val settings = new CsvParserSettings()
     settings.getFormat.setDelimiter(delimiter)
     settings.setUnescapedQuoteHandling(UnescapedQuoteHandling.STOP_AT_CLOSING_QUOTE)
+    settings.setMaxCharsPerColumn(65536)
 
     val parser = new com.univocity.parsers.csv.CsvParser(settings)
     read(parser.iterate(new File(path)).iterator())
