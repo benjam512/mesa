@@ -17,10 +17,12 @@
 package xyz.callide.mesa.data
 
 import java.io.InputStream
+import java.sql.ResultSet
 
 import xyz.callide.mesa.csv.CsvLoader
 import xyz.callide.mesa.data.conversion.{ConversionSet, DefaultConversionSet}
 import xyz.callide.mesa.ordering.OrderingDirection
+import xyz.callide.mesa.sql.ResultSetLoader
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
@@ -349,5 +351,10 @@ object DataSet {
                      (implicit set: ConversionSet = DefaultConversionSet): DataSet = {
 
     CsvLoader.read(getClass.getClassLoader.getResourceAsStream(name), delimiter)
+  }
+
+  def fromResultSet(results: ResultSet)(implicit set: ConversionSet = DefaultConversionSet): DataSet = {
+
+    ResultSetLoader.read(results)
   }
 }
