@@ -4,7 +4,7 @@ import java.sql.ResultSetMetaData
 
 class MockResultSetMetaData() extends ResultSetMetaData {
 
-  override def getColumnCount: Int = 5
+  override def getColumnCount: Int = 7
 
   override def getColumnType(column: Int): Int = {
 
@@ -14,6 +14,8 @@ class MockResultSetMetaData() extends ResultSetMetaData {
       case 3 => 5
       case 4 => -5
       case 5 => 12
+      case 6 => 91
+      case 7 => 93
       case _ => throw new IllegalArgumentException("Invalid column: " + column)
     }
   }
@@ -42,6 +44,8 @@ class MockResultSetMetaData() extends ResultSetMetaData {
       case 3 => "ints"
       case 4 => "longs"
       case 5 => "strings"
+      case 6 => "dates"
+      case 7 => "date-times"
     }
   }
 

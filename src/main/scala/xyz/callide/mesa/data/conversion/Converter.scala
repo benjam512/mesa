@@ -85,7 +85,7 @@ object Converter {
     private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
     override def convert(value: Any): LocalDateTime = value match {
       case v: LocalDateTime => v
-      case v: String => LocalDateTime.parse(v, formatter)
+      case v: String => LocalDateTime.parse(v.substring(0, 19), formatter)
       case _ => throw InvalidConversionException
     }
   }

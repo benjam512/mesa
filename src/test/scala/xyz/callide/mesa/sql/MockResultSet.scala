@@ -3,6 +3,7 @@ package xyz.callide.mesa.sql
 import java.io.{InputStream, Reader}
 import java.net.URL
 import java.sql.{Blob, Clob, Date, NClob, Ref, ResultSet, ResultSetMetaData, RowId, SQLWarning, SQLXML, Statement, Time, Timestamp}
+import java.time.{LocalDate, ZoneOffset}
 import java.{sql, util}
 import java.util.Calendar
 
@@ -11,11 +12,17 @@ class MockResultSet extends ResultSet {
   private var iter = -1
   private val maxIter = 5
 
-  val booleanVals = Array(true, false, false, true, true)
-  val doubleVals = Array(1.234, 2.345, 3.456, 4.567, 5.678)
-  val intVals = Array(2, 4, 6, 8, 10)
-  val longVals = Array(1, 3, 5, 7, 9)
-  val stringVals = Array("abc", "def", "ghi", "jkl", "mno")
+  private val startLocalDate = LocalDate.of(2000, 1, 1)
+  private val localDateVals = Array(1, 2, 3, 4, 5).map(i => startLocalDate.plusDays(i))
+  private val localDateTimeVals = Array(1, 2, 3, 4, 5).map(i => startLocalDate.minusDays(i).atTime(12, 0))
+
+  private val booleanVals = Array(true, false, false, true, true)
+  private val doubleVals = Array(1.234, 2.345, 3.456, 4.567, 5.678)
+  private val intVals = Array(2, 4, 6, 8, 10)
+  private val longVals = Array(1, 3, 5, 7, 9)
+  private val stringVals = Array("abc", "def", "ghi", "jkl", "mno")
+  private val dateVals = localDateVals.map(ld => new Date(ld.atStartOfDay(ZoneOffset.UTC).toEpochSecond * 1000))
+  private val timestampVals = localDateTimeVals.map(ldt => new Timestamp(ldt.toEpochSecond(ZoneOffset.UTC) * 1000))
 
   override def next(): Boolean = {
 
@@ -35,6 +42,8 @@ class MockResultSet extends ResultSet {
       case 3 => intVals(iter).toString
       case 4 => longVals(iter).toString
       case 5 => stringVals(iter)
+      case 6 => dateVals(iter).toString
+      case 7 => timestampVals(iter).toString
     }
   }
 
@@ -80,11 +89,23 @@ class MockResultSet extends ResultSet {
 
   override def getBytes(i: Int): Array[Byte] = throw new RuntimeException("unimplemented")
 
-  override def getDate(i: Int): Date = throw new RuntimeException("unimplemented")
+  override def getDate(i: Int): Date = {
+
+    i match {
+      case 6 => dateVals(iter)
+      case _ => throw new RuntimeException("Not a date field")
+    }
+  }
 
   override def getTime(i: Int): Time = throw new RuntimeException("unimplemented")
 
-  override def getTimestamp(i: Int): Timestamp = throw new RuntimeException("unimplemented")
+  override def getTimestamp(i: Int): Timestamp = {
+
+    i match {
+      case 7 => timestampVals(iter)
+      case _ => throw new RuntimeException("Not a timestamp field")
+    }
+  }
 
   override def getAsciiStream(i: Int): InputStream = throw new RuntimeException("unimplemented")
 
