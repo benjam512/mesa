@@ -77,6 +77,14 @@ case class DataSet(header: DataHeader, fields: Vector[DataField]) {
   def mapRows[A](f: DataRow => A): Vector[A] = Vector.range(0, count).map(i => f(row(i)))
 
   /**
+    * Applies the provided function to each row in the data set
+    *
+    * @param f the function to apply
+    */
+
+  def forEachRow(f: DataRow => Unit): Unit = for (i <- 0 until count) f(row(i))
+
+  /**
     * Appends the provided field to the data set
     *
     * @param name the name of the field to append

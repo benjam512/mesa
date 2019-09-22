@@ -3,6 +3,8 @@ package xyz.callide.mesa.sql
 import java.time.{LocalDate, LocalDateTime}
 
 import org.scalatest.FlatSpec
+import xyz.callide.mesa.data
+import xyz.callide.mesa.data.conversion.DefaultConversionSet
 import xyz.callide.mesa.data.{BooleanField, DataForm, DataHeader, DataSet, DoubleField, IntField, LocalDateField, LocalDateTimeField, LongField, StringField}
 
 class ResultSetLoaderTests extends FlatSpec {
@@ -36,5 +38,9 @@ class ResultSetLoaderTests extends FlatSpec {
                         new LocalDateTimeField(dateTimes))
 
     assert(data.fields == fields)
+
+    val inf = new DataForm.FormInference(DefaultConversionSet)
+    inf.infer("500000000")
+    println(inf.getForm)
   }
 }

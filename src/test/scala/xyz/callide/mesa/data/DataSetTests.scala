@@ -68,6 +68,14 @@ class DataSetTests extends FlatSpec with DataSetUtil {
     }) == Vector(true, false, true, false))
   }
 
+  it should "correctly apply a function for each row" in {
+
+    var sum = 0
+    data3.forEachRow(row => sum += row[Int]("A"))
+
+    assert(sum == 1158)
+  }
+
   it should "correctly append a field" in {
 
     val field = new IntField(Array(1, 2, 3, 4))
