@@ -332,7 +332,7 @@ object DataSet {
     */
 
   def fromCsvFile(path: String, delimiter: Char = ',')
-                 (implicit set: ConversionSet = DefaultConversionSet): DataSet = CsvLoader.read(path, delimiter)
+                 (implicit set: ConversionSet = DefaultConversionSet): DataSet = CsvLoader.readFromFile(path, delimiter)
 
   /**
     * Reads in a CSV from a stream
@@ -344,7 +344,7 @@ object DataSet {
     */
 
   def fromCsvStream(stream: InputStream, delimiter: Char = ',')
-                   (implicit set: ConversionSet = DefaultConversionSet): DataSet = CsvLoader.read(stream, delimiter)
+                   (implicit set: ConversionSet = DefaultConversionSet): DataSet = CsvLoader.readFromStream(stream, delimiter)
 
   /**
     * Reads in a CSV from resource
@@ -358,7 +358,7 @@ object DataSet {
   def fromCsvResource(name: String, delimiter: Char = ',')
                      (implicit set: ConversionSet = DefaultConversionSet): DataSet = {
 
-    CsvLoader.read(getClass.getClassLoader.getResourceAsStream(name), delimiter)
+    CsvLoader.readFromStream(getClass.getClassLoader.getResourceAsStream(name), delimiter)
   }
 
   def fromResultSet(results: ResultSet)(implicit set: ConversionSet = DefaultConversionSet): DataSet = {

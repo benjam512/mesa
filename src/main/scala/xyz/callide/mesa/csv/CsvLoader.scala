@@ -40,11 +40,14 @@ object CsvLoader {
     *
     * @param stream the input stream
     * @param delimiter column separator
+    * @param header denotes whether or not the CSV file contains a header row
     * @param set conversion set
     * @return data set
     */
 
-  def read(stream: InputStream, delimiter: Char)(implicit set: ConversionSet): DataSet = {
+  def readFromStream(stream: InputStream,
+                     delimiter: Char = ',',
+                     header: Boolean = true)(implicit set: ConversionSet): DataSet = {
 
     val settings = new CsvParserSettings()
     settings.getFormat.setDelimiter(delimiter)
@@ -52,7 +55,7 @@ object CsvLoader {
     settings.setMaxCharsPerColumn(65536)
 
     val parser = new com.univocity.parsers.csv.CsvParser(settings)
-    read(parser.iterate(stream).iterator())
+    read(parser.iterate(stream).iterator(), header)
   }
 
   /**
@@ -60,11 +63,14 @@ object CsvLoader {
     *
     * @param path the file path
     * @param delimiter column separator
+    * @param header denotes whether or not the CSV file contains a header row
     * @param set conversion set
     * @return data set
     */
 
-  def read(path: String, delimiter: Char)(implicit set: ConversionSet): DataSet = {
+  def readFromFile(path: String,
+                   delimiter: Char = ',',
+                   header: Boolean = true)(implicit set: ConversionSet): DataSet = {
 
     val settings = new CsvParserSettings()
     settings.getFormat.setDelimiter(delimiter)
@@ -72,7 +78,7 @@ object CsvLoader {
     settings.setMaxCharsPerColumn(65536)
 
     val parser = new com.univocity.parsers.csv.CsvParser(settings)
-    read(parser.iterate(new File(path)).iterator())
+    read(parser.iterate(new File(path)).iterator(), header)
   }
 
   /**
@@ -83,15 +89,14 @@ object CsvLoader {
     * @return data set
     */
 
-  private def read(iterator: ResultIterator[Array[String], ParsingContext])(implicit set: ConversionSet): DataSet = {
+  private def read(iterator: ResultIterator[Array[String], ParsingContext],
+                   header: Boolean)(implicit set: ConversionSet): DataSet = {
 
-    val names = if (iterator.hasNext) {
-      iterator.next
-    } else throw new RuntimeException("No header")
-
-    val firstLine = if (iterator.hasNext) {
-      iterator.next
-    } else throw new RuntimeException("No data")
+    val (names, firstLine) = if (iterator.hasNext) {
+      val head = if (header) Some(iterator.next) else None
+      val line = if (iterator.hasNext) iterator.next else throw new IllegalArgumentException("No data")
+      (head.getOrElse(Array.range(0, line.length).map(i => "V" + (i + 1).toString)), line)
+    } else throw new IllegalArgumentException("No data")
 
     val forms = inferForms(firstLine)
     val builders = initBuilders(forms, firstLine)
