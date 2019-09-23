@@ -140,6 +140,6 @@ object Converter {
     */
 
   implicit object DefaultStringConverter extends Converter[String] {
-    override def convert(value: Any): String = value.toString
+    override def convert(value: Any): String = if (value == null) "" else value.toString
   }
 }
