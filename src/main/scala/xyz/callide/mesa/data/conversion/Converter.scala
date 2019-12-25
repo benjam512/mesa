@@ -52,14 +52,14 @@ object Converter {
   implicit object DefaultBooleanConverter extends Converter[Boolean] {
     override def convert(value: Any): Boolean = value match {
       case v: Boolean => v
-      case v: Int => if (v == 0) false else if (v == 1) true else throw InvalidConversionException
-      case v: Long => if (v == 0) false else if (v == 1) true else throw InvalidConversionException
-      case v: Double => if (v == 0.0) false else if (v == 1.0) true else throw InvalidConversionException
+      case v: Int => if (v == 0) false else if (v == 1) true else throw InvalidConversionException[Boolean](v)
+      case v: Long => if (v == 0) false else if (v == 1) true else throw InvalidConversionException[Boolean](v)
+      case v: Double => if (v == 0.0) false else if (v == 1.0) true else throw InvalidConversionException[Boolean](v)
       case v: String => v match {
         case "false" | "False" | "FALSE" | "0" => false
         case "true" | "True" | "TRUE" | "1" => true
       }
-      case _ => throw InvalidConversionException
+      case v => throw InvalidConversionException[Boolean](v)
     }
   }
 
@@ -73,7 +73,7 @@ object Converter {
       case v: LocalDate => v
       case v: LocalDateTime => v.toLocalDate
       case v: String => LocalDate.parse(v, formatter)
-      case _ => throw InvalidConversionException
+      case v => throw InvalidConversionException[LocalDate](v)
     }
   }
 
@@ -86,7 +86,7 @@ object Converter {
     override def convert(value: Any): LocalDateTime = value match {
       case v: LocalDateTime => v
       case v: String => LocalDateTime.parse(v.substring(0, 19), formatter)
-      case _ => throw InvalidConversionException
+      case v => throw InvalidConversionException[LocalDateTime](v)
     }
   }
 
@@ -101,7 +101,7 @@ object Converter {
       case v: Int => v.toDouble
       case v: Long => v.toDouble
       case v: String => v.toDouble
-      case _ => throw InvalidConversionException
+      case v => throw InvalidConversionException[Double](v)
     }
   }
 
@@ -116,7 +116,7 @@ object Converter {
       case v: Long => v.toInt
       case v: Double => v.toInt
       case v: String => v.toInt
-      case _ => throw InvalidConversionException
+      case v => throw InvalidConversionException[Int](v)
     }
   }
 
@@ -131,7 +131,7 @@ object Converter {
       case v: Int => v.toLong
       case v: Double => v.toLong
       case v: String => v.toLong
-      case _ => throw InvalidConversionException
+      case v => throw InvalidConversionException[Long](v)
     }
   }
 

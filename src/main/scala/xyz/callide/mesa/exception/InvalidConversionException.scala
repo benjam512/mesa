@@ -16,8 +16,14 @@
 
 package xyz.callide.mesa.exception
 
+import scala.reflect.ClassTag
+
 /**
   * Gets thrown when attempting to make an invalid conversion between data types
   */
 
-object InvalidConversionException extends RuntimeException
+case class InvalidConversionException[A](input: Any)(implicit val tag: ClassTag[A]) extends RuntimeException {
+
+  override def getMessage: String = s"Cannot convert '${input.toString}' to type '${tag.toString}'"
+
+}
