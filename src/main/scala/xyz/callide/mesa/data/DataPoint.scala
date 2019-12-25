@@ -24,7 +24,9 @@ import xyz.callide.mesa.data.conversion.Converter
   * @param value point value
   */
 
-case class DataPoint(value: Any) {
+case class DataPoint(value: Option[Any]) {
 
-  def as[A](implicit converter: Converter[A]): A = converter.convert(value)
+  def as[A](implicit converter: Converter[A]): A = converter.convert(value.get)
+
+  def get[A](implicit converter: Converter[A]): Option[A] = value.map(converter.convert)
 }

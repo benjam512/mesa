@@ -20,7 +20,7 @@ import java.io.InputStream
 import java.sql.ResultSet
 
 import xyz.callide.mesa.csv.CsvLoader
-import xyz.callide.mesa.data.conversion.{ConversionSet, DefaultConversionSet}
+import xyz.callide.mesa.data.conversion.ConversionSet
 import xyz.callide.mesa.ordering.OrderingDirection
 import xyz.callide.mesa.sql.ResultSetLoader
 
@@ -55,7 +55,7 @@ case class DataSet(header: DataHeader, fields: Vector[DataField]) {
     * @return indicated field
     */
 
-  def apply(name: String): DataField = fields(header.fieldColumn(name))
+  def apply(name: String): DataField = fields(header.column(name))
 
   /**
     * Provides the indicated row
@@ -121,7 +121,7 @@ case class DataSet(header: DataHeader, fields: Vector[DataField]) {
 
   def drop(name: String): DataSet = {
 
-    val fieldToDrop = fields(header.fieldColumn(name))
+    val fieldToDrop = fields(header.column(name))
     new DataSet(header.remove(name), fields.filter(field => field != fieldToDrop))
   }
 
@@ -136,7 +136,7 @@ case class DataSet(header: DataHeader, fields: Vector[DataField]) {
 
     require(count == other.count, "Cannot merge data set with different number of records")
     new DataSet(other.header.fieldNames.foldLeft(header)((result, name) => {
-      result.append(name, other.header.fieldForm(name))
+      result.append(name, other.header.form(name))
     }), fields ++ other.fields)
   }
 
@@ -163,8 +163,8 @@ case class DataSet(header: DataHeader, fields: Vector[DataField]) {
 
   def select(names: String*): DataSet = {
 
-    new DataSet(DataHeader(names.map(name => (name, header.fieldForm(name)))),
-                names.map(header.fieldColumn).map(ind => fields(ind)).toVector)
+    new DataSet(DataHeader(names.map(name => (name, header.form(name)))),
+                names.map(header.column).map(ind => fields(ind)).toVector)
   }
 
   /**
@@ -291,12 +291,18 @@ case class DataSet(header: DataHeader, fields: Vector[DataField]) {
       " " + front + input + back + " "
     }
 
+    def display(a: Any): String = {
+
+      val point = if (a == null) DataPoint(Option.empty[Any]) else DataPoint(Some(a))
+      point.get[String].getOrElse("[NULL]")
+    }
+
     val widths = header.fieldNames.map(_.length).toArray
 
     for (i <- 0 until math.min(limit, count)) {
       val r = row(i)
       r.elements.zipWithIndex.foreach({case (elem, j) =>
-        widths(j) = math.min(math.max(widths(j), DataPoint(elem).as[String].length), maxWidth)
+        widths(j) = math.min(math.max(widths(j), display(elem).length), maxWidth)
       })
     }
 
@@ -309,7 +315,7 @@ case class DataSet(header: DataHeader, fields: Vector[DataField]) {
     for (i <- 0 until math.min(limit, count)) {
       val r = row(i)
       r.elements.zipWithIndex.foreach({case (elem, j) =>
-        print(pad(DataPoint(elem).as[String], widths(j)))
+        print(pad(display(elem), widths(j)))
       })
       println()
     }
@@ -332,7 +338,7 @@ object DataSet {
     */
 
   def fromCsvFile(path: String, delimiter: Char = ',')
-                 (implicit set: ConversionSet = DefaultConversionSet): DataSet = CsvLoader.readFromFile(path, delimiter)
+                 (implicit set: ConversionSet = ConversionSet()): DataSet = CsvLoader.readFromFile(path, delimiter)
 
   /**
     * Reads in a CSV from a stream
@@ -344,7 +350,7 @@ object DataSet {
     */
 
   def fromCsvStream(stream: InputStream, delimiter: Char = ',')
-                   (implicit set: ConversionSet = DefaultConversionSet): DataSet = CsvLoader.readFromStream(stream, delimiter)
+                   (implicit set: ConversionSet = ConversionSet()): DataSet = CsvLoader.readFromStream(stream, delimiter)
 
   /**
     * Reads in a CSV from resource
@@ -356,12 +362,12 @@ object DataSet {
     */
 
   def fromCsvResource(name: String, delimiter: Char = ',')
-                     (implicit set: ConversionSet = DefaultConversionSet): DataSet = {
+                     (implicit set: ConversionSet = ConversionSet()): DataSet = {
 
     CsvLoader.readFromStream(getClass.getClassLoader.getResourceAsStream(name), delimiter)
   }
 
-  def fromResultSet(results: ResultSet)(implicit set: ConversionSet = DefaultConversionSet): DataSet = {
+  def fromResultSet(results: ResultSet)(implicit set: ConversionSet = ConversionSet()): DataSet = {
 
     ResultSetLoader.read(results)
   }

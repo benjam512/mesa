@@ -4,7 +4,7 @@ import java.time.{LocalDate, LocalDateTime}
 
 import org.scalatest.FlatSpec
 import xyz.callide.mesa.data
-import xyz.callide.mesa.data.conversion.DefaultConversionSet
+import xyz.callide.mesa.data.conversion.ConversionSet
 import xyz.callide.mesa.data.{BooleanField, DataForm, DataHeader, DataSet, DoubleField, IntField, LocalDateField, LocalDateTimeField, LongField, StringField}
 
 class ResultSetLoaderTests extends FlatSpec {
@@ -29,17 +29,17 @@ class ResultSetLoaderTests extends FlatSpec {
                           LocalDateTime.of(1999, 12, 29, 7, 0), LocalDateTime.of(1999, 12, 28, 7, 0),
                           LocalDateTime.of(1999, 12, 27, 7, 0))
 
-    val fields = Vector(new BooleanField(Array(true, false, false, true, true)),
-                        new DoubleField(Array(1.234, 2.345, 3.456, 4.567, 5.678)),
-                        new IntField(Array(2, 4, 6, 8, 10)),
-                        new LongField(Array(1, 3, 5, 7, 9)),
-                        new StringField(Array("abc", "def", "ghi", "jkl", "mno")),
-                        new LocalDateField(dates),
-                        new LocalDateTimeField(dateTimes))
+    val fields = Vector(BooleanField(Array(true, false, false, true, true)),
+                        DoubleField(Array(1.234, 2.345, 3.456, 4.567, 5.678)),
+                        IntField(Array(2, 4, 6, 8, 10)),
+                        LongField(Array(1, 3, 5, 7, 9)),
+                        StringField(Array("abc", "def", "ghi", "jkl", "mno")),
+                        LocalDateField(dates),
+                        LocalDateTimeField(dateTimes))
 
     assert(data.fields == fields)
 
-    val inf = new DataForm.FormInference(DefaultConversionSet)
+    val inf = new DataForm.FormInference(ConversionSet())
     inf.infer("500000000")
     println(inf.getForm)
   }

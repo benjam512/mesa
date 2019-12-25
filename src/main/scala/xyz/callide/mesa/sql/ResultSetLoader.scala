@@ -48,13 +48,13 @@ object ResultSetLoader {
 
     Vector.range(1, metadata.getColumnCount + 1).map(col => {
       getDataForm(metadata.getColumnType(col)) match {
-        case Some(DataForm.Boolean) => new BooleanFieldBuilder(ArrayBuffer.empty[Boolean])
-        case Some(DataForm.LocalDate) => new LocalDateFieldBuilder(ArrayBuffer.empty[LocalDate])
-        case Some(DataForm.LocalDateTime) => new LocalDateTimeFieldBuilder(ArrayBuffer.empty[LocalDateTime])
-        case Some(DataForm.Double) => new DoubleFieldBuilder(ArrayBuffer.empty[Double])
-        case Some(DataForm.Int) => new IntFieldBuilder(ArrayBuffer.empty[Int])
-        case Some(DataForm.Long) => new LongFieldBuilder(ArrayBuffer.empty[Long])
-        case _ => new StringFieldBuilder(ArrayBuffer.empty[String])
+        case Some(DataForm.Boolean) => new BooleanFieldBuilder(ArrayBuffer.empty[Option[Boolean]])
+        case Some(DataForm.LocalDate) => new LocalDateFieldBuilder(ArrayBuffer.empty[Option[LocalDate]])
+        case Some(DataForm.LocalDateTime) => new LocalDateTimeFieldBuilder(ArrayBuffer.empty[Option[LocalDateTime]])
+        case Some(DataForm.Double) => new DoubleFieldBuilder(ArrayBuffer.empty[Option[Double]])
+        case Some(DataForm.Int) => new IntFieldBuilder(ArrayBuffer.empty[Option[Int]])
+        case Some(DataForm.Long) => new LongFieldBuilder(ArrayBuffer.empty[Option[Long]])
+        case _ => new StringFieldBuilder(ArrayBuffer.empty[Option[String]])
       }
     })
   }

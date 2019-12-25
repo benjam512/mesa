@@ -61,7 +61,11 @@ object DataForm {
 
     def infer(input: String): Unit = {
 
-      tryLocalDateTime(input)
+      if (input != null && input.nonEmpty && !input.forall(c => c == ' ')) {
+        tryLocalDateTime(input)
+      } else if (form.isEmpty) {
+        form = Some(LocalDateTime)
+      }
     }
 
     private def tryLocalDateTime(input: String): Unit = {

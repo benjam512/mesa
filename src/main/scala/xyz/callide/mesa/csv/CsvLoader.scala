@@ -130,9 +130,9 @@ object CsvLoader {
   private def inferForms(line: Array[String])(implicit set: ConversionSet): Array[FormInference] = {
 
     line.map(elem => {
-      val inf = new FormInference(set)
-      inf.infer(elem)
-      inf
+      val fi = new FormInference(set)
+      fi.infer(elem)
+      fi
     })
   }
 
@@ -149,16 +149,27 @@ object CsvLoader {
                           (implicit set: ConversionSet): Array[DataFieldBuilder] = {
 
     forms.zipWithIndex.map({case (inf, ind) =>
+      val elem = line(ind) match {
+        case null => None
+        case "" => None
+        case v if v.forall(c => c == ' ') => None
+        case v => Some(v)
+      }
       inf.getForm match {
-        case Some(DataForm.Boolean) => new BooleanFieldBuilder(ArrayBuffer(set.booleanConverter.convert(line(ind))))
+        case Some(DataForm.Boolean) =>
+          new BooleanFieldBuilder(ArrayBuffer(elem.map(set.booleanConverter.convert)))
         case Some(DataForm.LocalDate) =>
-          new LocalDateFieldBuilder(ArrayBuffer(set.localDateConverter.convert(line(ind))))
+          new LocalDateFieldBuilder(ArrayBuffer(elem.map(set.localDateConverter.convert)))
         case Some(DataForm.LocalDateTime) =>
-          new LocalDateTimeFieldBuilder(ArrayBuffer(set.localDateTimeConverter.convert(line(ind))))
-        case Some(DataForm.Double) => new DoubleFieldBuilder(ArrayBuffer(set.doubleConverter.convert(line(ind))))
-        case Some(DataForm.Int) => new IntFieldBuilder(ArrayBuffer(set.intConverter.convert(line(ind))))
-        case Some(DataForm.Long) => new LongFieldBuilder(ArrayBuffer(set.longConverter.convert(line(ind))))
-        case _ => new StringFieldBuilder(ArrayBuffer(set.stringConverter.convert(line(ind))))
+          new LocalDateTimeFieldBuilder(ArrayBuffer(elem.map(set.localDateTimeConverter.convert)))
+        case Some(DataForm.Double) =>
+          new DoubleFieldBuilder(ArrayBuffer(elem.map(set.doubleConverter.convert)))
+        case Some(DataForm.Int) =>
+          new IntFieldBuilder(ArrayBuffer(elem.map(set.intConverter.convert)))
+        case Some(DataForm.Long) =>
+          new LongFieldBuilder(ArrayBuffer(elem.map(set.longConverter.convert)))
+        case _ =>
+          new StringFieldBuilder(ArrayBuffer(elem.map(set.stringConverter.convert)))
       }
     })
   }
@@ -177,30 +188,51 @@ object CsvLoader {
     inf.getForm match {
       case Some(DataForm.Boolean) =>
         new BooleanFieldBuilder(ArrayBuffer.range(0, builder.length).map(i => {
-          set.booleanConverter.convert(builder(i))
+          builder(i) match {
+            case null | None => Option.empty
+            case v => Some(set.booleanConverter.convert(v))
+          }
         }))
       case Some(DataForm.LocalDate) =>
-        new LocalDateTimeFieldBuilder(ArrayBuffer.range(0, builder.length).map(i => {
-          set.localDateTimeConverter.convert(builder(i))
+        new LocalDateFieldBuilder(ArrayBuffer.range(0, builder.length).map(i => {
+          builder(i) match {
+            case null | None => Option.empty
+            case v => Some(set.localDateConverter.convert(v))
+          }
         }))
       case Some(DataForm.LocalDateTime) =>
-        new LocalDateFieldBuilder(ArrayBuffer.range(0, builder.length).map(i => {
-          set.localDateConverter.convert(builder(i))
+        new LocalDateTimeFieldBuilder(ArrayBuffer.range(0, builder.length).map(i => {
+          builder(i) match {
+            case null | None => Option.empty
+            case v => Some(set.localDateTimeConverter.convert(v))
+          }
         }))
       case Some(DataForm.Double) =>
         new DoubleFieldBuilder(ArrayBuffer.range(0, builder.length).map(i => {
-          set.doubleConverter.convert(builder(i))
+          builder(i) match {
+            case null | None => Option.empty
+            case v => Some(set.doubleConverter.convert(v))
+          }
         }))
       case Some(DataForm.Int) =>
         new IntFieldBuilder(ArrayBuffer.range(0, builder.length).map(i => {
-          set.intConverter.convert(builder(i))
+          builder(i) match {
+            case null | None => Option.empty
+            case v => Some(set.intConverter.convert(v))
+          }
         }))
       case Some(DataForm.Long) =>
         new LongFieldBuilder(ArrayBuffer.range(0, builder.length).map(i => {
-          set.longConverter.convert(builder(i))
+          builder(i) match {
+            case null | None => Option.empty
+            case v => Some(set.longConverter.convert(v))
+          }
         }))
       case _ => new StringFieldBuilder(ArrayBuffer.range(0, builder.length).map(i => {
-        set.stringConverter.convert(builder(i))
+        builder(i) match {
+          case null | None => Option.empty
+          case v => Some(set.stringConverter.convert(v))
+        }
       }))
     }
   }

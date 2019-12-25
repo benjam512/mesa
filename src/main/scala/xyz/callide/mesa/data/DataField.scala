@@ -26,108 +26,124 @@ import xyz.callide.mesa.data.conversion.Converter
 
 trait DataField {
 
-  def form: DataForm
+  type DataType
 
-  def point(ind: Int): DataPoint = DataPoint(raw(ind))
+  val form: DataForm
 
-  def raw(ind: Int): Any
+  protected val elements: Array[Option[DataType]]
 
-  def apply[B](ind: Int)(implicit converter: Converter[B]): B
+  lazy val hasMissingValues: Boolean = elements.exists(elem => elem.isEmpty)
 
-  def mapTo[B](implicit converter: Converter[B]): Vector[B]
+  def point(ind: Int): DataPoint = DataPoint(elements(ind))
 
-  def length: Int
+  def raw(ind: Int): Any = elements(ind).orNull
+
+  def points: Vector[DataPoint] = elements.map(elem => DataPoint(elem)).toVector
+
+  def extract[B](implicit converter: Converter[B]): Vector[B] = {
+
+    elements.flatMap(elem => elem.map(converter.convert)).toVector
+  }
+
+  def extract[B](default: B)(implicit converter: Converter[B]): Vector[B] = {
+
+    elements.map(elem => {
+      elem.map(converter.convert).getOrElse(default)
+    }).toVector
+  }
+
+  def length: Int = elements.length
 
   def subset(indices: Seq[Int]): DataField
 }
 
-class BooleanField(private val values: Array[Boolean]) extends DataField {
-  override def form: DataForm = DataForm.Boolean
-  override def raw(ind: Int): Any = values(ind)
-  override def apply[B](ind: Int)(implicit converter: Converter[B]): B = converter.convert(values(ind))
-  override def mapTo[B](implicit converter: Converter[B]): Vector[B] = values.map(converter.convert).toVector
-  override def length: Int = values.length
-  override def subset(indices: Seq[Int]): BooleanField = new BooleanField(indices.map(ind => values(ind)).toArray)
+class BooleanField(protected val elements: Array[Option[Boolean]]) extends DataField {
+  override type DataType = Boolean
+  override val form: DataForm = DataForm.Boolean
+  override def subset(indices: Seq[Int]): BooleanField = new BooleanField(indices.map(ind => elements(ind)).toArray)
   override def equals(obj: Any): Boolean = obj match {
-    case field: BooleanField => field.values.sameElements(values)
+    case field: BooleanField => field.elements.sameElements(elements)
     case _ => false
   }
 }
+object BooleanField {
+  def apply(elements: Array[Boolean]): BooleanField = new BooleanField(elements.map(elem => Some(elem)))
+}
 
-class LocalDateField(private val values: Array[LocalDate]) extends DataField {
-  override def form: DataForm = DataForm.LocalDate
-  override def raw(ind: Int): Any = values(ind)
-  override def apply[B](ind: Int)(implicit converter: Converter[B]): B = converter.convert(values(ind))
-  override def mapTo[B](implicit converter: Converter[B]): Vector[B] = values.map(converter.convert).toVector
-  override def length: Int = values.length
-  override def subset(indices: Seq[Int]): LocalDateField = new LocalDateField(indices.map(ind => values(ind)).toArray)
+class LocalDateField(protected val elements: Array[Option[LocalDate]]) extends DataField {
+  override type DataType = LocalDate
+  override val form: DataForm = DataForm.LocalDate
+  override def subset(indices: Seq[Int]): LocalDateField = new LocalDateField(indices.map(ind => elements(ind)).toArray)
   override def equals(obj: Any): Boolean = obj match {
-    case field: LocalDateField => field.values.sameElements(values)
+    case field: LocalDateField => field.elements.sameElements(elements)
     case _ => false
   }
 }
+object LocalDateField {
+  def apply(elements: Array[LocalDate]): LocalDateField = new LocalDateField(elements.map(elem => Some(elem)))
+}
 
-class LocalDateTimeField(private val values: Array[LocalDateTime]) extends DataField {
-  override def form: DataForm = DataForm.LocalDateTime
-  override def raw(ind: Int): Any = values(ind)
-  override def apply[B](ind: Int)(implicit converter: Converter[B]): B = converter.convert(values(ind))
-  override def mapTo[B](implicit converter: Converter[B]): Vector[B] = values.map(converter.convert).toVector
-  override def length: Int = values.length
-  override def subset(indices: Seq[Int]): LocalDateTimeField = new LocalDateTimeField(indices.map(ind => values(ind)).toArray)
+class LocalDateTimeField(protected val elements: Array[Option[LocalDateTime]]) extends DataField {
+  override type DataType = LocalDateTime
+  override val form: DataForm = DataForm.LocalDateTime
+  override def subset(indices: Seq[Int]): LocalDateTimeField = new LocalDateTimeField(indices.map(ind => elements(ind)).toArray)
   override def equals(obj: Any): Boolean = obj match {
-    case field: LocalDateTimeField => field.values.sameElements(values)
+    case field: LocalDateTimeField => field.elements.sameElements(elements)
     case _ => false
   }
 }
+object LocalDateTimeField {
+  def apply(elements: Array[LocalDateTime]): LocalDateTimeField = new LocalDateTimeField(elements.map(elem => Some(elem)))
+}
 
-class DoubleField(private val values: Array[Double]) extends DataField {
-  override def form: DataForm = DataForm.Double
-  override def raw(ind: Int): Any = values(ind)
-  override def apply[B](ind: Int)(implicit converter: Converter[B]): B = converter.convert(values(ind))
-  override def mapTo[B](implicit converter: Converter[B]): Vector[B] = values.map(converter.convert).toVector
-  override def length: Int = values.length
-  override def subset(indices: Seq[Int]): DoubleField = new DoubleField(indices.map(ind => values(ind)).toArray)
+class DoubleField(protected val elements: Array[Option[Double]]) extends DataField {
+  override type DataType = Double
+  override val form: DataForm = DataForm.Double
+  override def subset(indices: Seq[Int]): DoubleField = new DoubleField(indices.map(ind => elements(ind)).toArray)
   override def equals(obj: Any): Boolean = obj match {
-    case field: DoubleField => field.values.sameElements(values)
+    case field: DoubleField => field.elements.sameElements(elements)
     case _ => false
   }
 }
+object DoubleField {
+  def apply(elements: Array[Double]): DoubleField = new DoubleField(elements.map(elem => Some(elem)))
+}
 
-class IntField(private val values: Array[Int]) extends DataField {
-  override def form: DataForm = DataForm.Int
-  override def raw(ind: Int): Any = values(ind)
-  override def apply[B](ind: Int)(implicit converter: Converter[B]): B = converter.convert(values(ind))
-  override def mapTo[B](implicit converter: Converter[B]): Vector[B] = values.map(converter.convert).toVector
-  override def length: Int = values.length
-  override def subset(indices: Seq[Int]): IntField = new IntField(indices.map(ind => values(ind)).toArray)
+class IntField(protected val elements: Array[Option[Int]]) extends DataField {
+  override type DataType = Int
+  override val form: DataForm = DataForm.Int
+  override def subset(indices: Seq[Int]): IntField = new IntField(indices.map(ind => elements(ind)).toArray)
   override def equals(obj: Any): Boolean = obj match {
-    case field: IntField => field.values.sameElements(values)
+    case field: IntField => field.elements.sameElements(elements)
     case _ => false
   }
 }
+object IntField {
+  def apply(elements: Array[Int]): IntField = new IntField(elements.map(elem => Some(elem)))
+}
 
-class LongField(private val values: Array[Long]) extends DataField {
-  override def form: DataForm = DataForm.Long
-  override def raw(ind: Int): Any = values(ind)
-  override def apply[B](ind: Int)(implicit converter: Converter[B]): B = converter.convert(values(ind))
-  override def mapTo[B](implicit converter: Converter[B]): Vector[B] = values.map(converter.convert).toVector
-  override def length: Int = values.length
-  override def subset(indices: Seq[Int]): LongField = new LongField(indices.map(ind => values(ind)).toArray)
+class LongField(protected val elements: Array[Option[Long]]) extends DataField {
+  override type DataType = Long
+  override val form: DataForm = DataForm.Long
+  override def subset(indices: Seq[Int]): LongField = new LongField(indices.map(ind => elements(ind)).toArray)
   override def equals(obj: Any): Boolean = obj match {
-    case field: LongField => field.values.sameElements(values)
+    case field: LongField => field.elements.sameElements(elements)
     case _ => false
   }
 }
+object LongField {
+  def apply(elements: Array[Long]): LongField = new LongField(elements.map(elem => Some(elem)))
+}
 
-class StringField(private val values: Array[String]) extends DataField {
-  override def form: DataForm = DataForm.String
-  override def raw(ind: Int): Any = values(ind)
-  override def apply[B](ind: Int)(implicit converter: Converter[B]): B = converter.convert(values(ind))
-  override def mapTo[B](implicit converter: Converter[B]): Vector[B] = values.map(converter.convert).toVector
-  override def length: Int = values.length
-  override def subset(indices: Seq[Int]): StringField = new StringField(indices.map(ind => values(ind)).toArray)
+class StringField(protected val elements: Array[Option[String]]) extends DataField {
+  override type DataType = String
+  override val form: DataForm = DataForm.String
+  override def subset(indices: Seq[Int]): StringField = new StringField(indices.map(ind => elements(ind)).toArray)
   override def equals(obj: Any): Boolean = obj match {
-    case field: StringField => field.values.sameElements(values)
+    case field: StringField => field.elements.sameElements(elements)
     case _ => false
   }
+}
+object StringField {
+  def apply(elements: Array[String]): StringField = new StringField(elements.map(elem => Some(elem)))
 }

@@ -11,9 +11,12 @@ class DataHeaderTests extends FlatSpec {
     val info = List(("A", DataForm.Int), ("B", DataForm.String))
     val header = DataHeader(info)
     assert(header.fieldNames == List("A", "B"))
-    assert(header.fieldName == Map(0 -> "A", 1 -> "B"))
-    assert(header.fieldColumn == Map("A" -> 0, "B" -> 1))
-    assert(header.fieldForm == Map("A" -> DataForm.Int, "B" -> DataForm.String))
+    assert(header.name(0) == "A")
+    assert(header.name(1) == "B")
+    assert(header.column("A") == 0)
+    assert(header.column("B") == 1)
+    assert(header.form("A") == DataForm.Int)
+    assert(header.form("B") == DataForm.String)
   }
 
   it should "correctly append a field" in {
@@ -21,9 +24,15 @@ class DataHeaderTests extends FlatSpec {
     val info = List(("A", DataForm.Int), ("B", DataForm.String))
     val header = DataHeader(info).append("C", DataForm.Boolean)
     assert(header.fieldNames == List("A", "B", "C"))
-    assert(header.fieldName == Map(0 -> "A", 1 -> "B", 2 -> "C"))
-    assert(header.fieldColumn == Map("A" -> 0, "B" -> 1, "C" -> 2))
-    assert(header.fieldForm == Map("A" -> DataForm.Int, "B" -> DataForm.String, "C" -> DataForm.Boolean))
+    assert(header.name(0) == "A")
+    assert(header.name(1) == "B")
+    assert(header.name(2) == "C")
+    assert(header.column("A") == 0)
+    assert(header.column("B") == 1)
+    assert(header.column("C") == 2)
+    assert(header.form("A") == DataForm.Int)
+    assert(header.form("B") == DataForm.String)
+    assert(header.form("C") == DataForm.Boolean)
   }
 
   it should "correctly prepend a field" in {
@@ -31,9 +40,15 @@ class DataHeaderTests extends FlatSpec {
     val info = List(("A", DataForm.Int), ("B", DataForm.String))
     val header = DataHeader(info).prepend("C", DataForm.Boolean)
     assert(header.fieldNames == List("C", "A", "B"))
-    assert(header.fieldName == Map(1 -> "A", 2 -> "B", 0 -> "C"))
-    assert(header.fieldColumn == Map("A" -> 1, "B" -> 2, "C" -> 0))
-    assert(header.fieldForm == Map("A" -> DataForm.Int, "B" -> DataForm.String, "C" -> DataForm.Boolean))
+    assert(header.name(0) == "C")
+    assert(header.name(1) == "A")
+    assert(header.name(2) == "B")
+    assert(header.column("A") == 1)
+    assert(header.column("B") == 2)
+    assert(header.column("C") == 0)
+    assert(header.form("A") == DataForm.Int)
+    assert(header.form("B") == DataForm.String)
+    assert(header.form("C") == DataForm.Boolean)
   }
 
   it should "correctly remove a field" in {
@@ -41,9 +56,12 @@ class DataHeaderTests extends FlatSpec {
     val info = List(("A", DataForm.Int), ("B", DataForm.String))
     val header = DataHeader(info).append("C", DataForm.Boolean).remove("B")
     assert(header.fieldNames == List("A", "C"))
-    assert(header.fieldName == Map(0 -> "A", 1 -> "C"))
-    assert(header.fieldColumn == Map("A" -> 0, "C" -> 1))
-    assert(header.fieldForm == Map("A" -> DataForm.Int, "C" -> DataForm.Boolean))
+    assert(header.name(0) == "A")
+    assert(header.name(1) == "C")
+    assert(header.column("A") == 0)
+    assert(header.column("C") == 1)
+    assert(header.form("A") == DataForm.Int)
+    assert(header.form("C") == DataForm.Boolean)
   }
 
   it should "correctly check if the header contains a field name" in {

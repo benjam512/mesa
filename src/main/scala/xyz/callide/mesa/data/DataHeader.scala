@@ -23,10 +23,24 @@ package xyz.callide.mesa.data
   * @param fieldName map of column to field name
   */
 
-case class DataHeader(fieldColumn: Map[String, Int], fieldName: Map[Int, String], fieldForm: Map[String, DataForm]) {
+case class DataHeader(private val fieldColumn: Map[String, Int],
+                      private val fieldName: Map[Int, String],
+                      private val fieldForm: Map[String, DataForm]) {
 
   require(fieldColumn.size == fieldName.size, "Column map and name map size mismatch")
   require(fieldColumn.size == fieldForm.size, "Column map and form map size mismatch")
+
+  def column(name: String): Int = fieldColumn(name)
+
+  def getColumn(name: String): Option[Int] = fieldColumn.get(name)
+
+  def name(column: Int): String = fieldName(column)
+
+  def getName(column: Int): Option[String] = fieldName.get(column)
+
+  def form(name: String): DataForm = fieldForm(name)
+
+  def getForm(name: String): Option[DataForm] = fieldForm.get(name)
 
   /**
     * Provides the size of the header (number of fields)

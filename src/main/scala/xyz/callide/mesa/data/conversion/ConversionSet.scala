@@ -18,17 +18,16 @@ package xyz.callide.mesa.data.conversion
 
 import java.time.{LocalDate, LocalDateTime}
 
+import xyz.callide.mesa.data.conversion.Converter.{DefaultBooleanConverter, DefaultDoubleConverter, DefaultIntConverter, DefaultLocalDateConverter, DefaultLocalDateTimeConverter, DefaultLongConverter, DefaultStringConverter}
+
 /**
   * Holds a valid converter for each data form
   */
 
-trait ConversionSet {
-
-  val localDateTimeConverter: Converter[LocalDateTime]
-  val localDateConverter: Converter[LocalDate]
-  val booleanConverter: Converter[Boolean]
-  val doubleConverter: Converter[Double]
-  val intConverter: Converter[Int]
-  val longConverter: Converter[Long]
-  val stringConverter: Converter[String]
-}
+case class ConversionSet(localDateTimeConverter: Converter[LocalDateTime] = DefaultLocalDateTimeConverter,
+                         localDateConverter: Converter[LocalDate] = DefaultLocalDateConverter,
+                         booleanConverter: Converter[Boolean] = DefaultBooleanConverter,
+                         doubleConverter: Converter[Double] = DefaultDoubleConverter,
+                         intConverter: Converter[Int] = DefaultIntConverter,
+                         longConverter: Converter[Long] = DefaultLongConverter,
+                         stringConverter: Converter[String] = DefaultStringConverter)

@@ -29,14 +29,21 @@ case class DataRow(header: DataHeader, elements: Vector[Any]) {
 
   def raw(ind: Int): Any = elements(ind)
 
-  def raw(name: String): Any = elements(header.fieldColumn(name))
+  def raw(name: String): Any = elements(header.column(name))
 
   def apply[A](ind: Int)(implicit converter: Converter[A]): A = converter.convert(elements(ind))
 
-  def apply[A](name: String)(implicit converter: Converter[A]): A = {
+  def apply[A](name: String)(implicit converter: Converter[A]): A = apply(header.column(name))
 
-    converter.convert(elements(header.fieldColumn(name)))
+  def get[A](ind: Int)(implicit converter: Converter[A]): Option[A] = {
+
+    elements(ind) match {
+      case elem if elem != null => Some(converter.convert(elem))
+      case _ => None
+    }
   }
+
+  def get[A](name: String)(implicit converter: Converter[A]): Option[A] = get(header.column(name))
 
   def map[A](f: Any => A): Vector[A] = elements.map(f)
 }
