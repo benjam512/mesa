@@ -35,9 +35,15 @@ In order to store data in the appropriate type, we need to implement a `Converte
 responsible for taking in an arbitrary input of type `Any`, and attempting to convert it to the specified result type. Default
 converters are provided for all of the supported data types, which provide "reasonable" behavior for most use cases.
 
-To load data from either a CSV for a `ResultSet`, we need an implicit instance of a `ConversionSet`, which is simply a complete
+To load data from either a CSV or a `ResultSet`, we need an implicit instance of a `ConversionSet`, which is simply a complete
 set of individual `Converter`s that covers all supported data types. A default `ConversionSet` is provided which is comprised of
 each data type's default `Converter`.
+
+## Missing Values
+
+If loading from a CSV file, any empty or blank-space entries are interpreted as missing values. Likewise, when loading from 
+a result set, any null values are considered to be missing data points. Internally, each field is stored as an array of 
+optional values, and we can use this to elegantly handle cases of missing data.
 
 ## Examples
 
@@ -70,4 +76,18 @@ data.group("age")(_.as[Int])
 // count rows that match condition
 data.count("score")(point => point.as[Double] < 65.0 || point.as[Double] > 95.0)
 
+```
+
+### Handling Missing Data
+
+```scala
+val field = data("score") // [83.5, 75.1, 94.2, ?, 87.6]
+field.extract[Double] // simply filter out missing values => [83.5, 75.1, 94.2, 87.6]
+field.extract[Double](0.0) // provide default value => [83.5, 75.1, 94.2, 0.0, 87.6]
+
+field.point(0).as[Double] // 83.5
+field.point(0).get[Double] // Some(83.5)
+
+field.point(3).as[Double] // runtime error!
+field.point(3).get[Double] // None
 ```
