@@ -45,5 +45,5 @@ case class DataRow(header: DataHeader, elements: Vector[Any]) {
 
   def get[A](name: String)(implicit converter: Converter[A]): Option[A] = get(header.column(name))
 
-  def map[A](f: Any => A): Vector[A] = elements.map(f)
+  def map[A](f: DataPoint => A): Vector[A] = elements.map(v => f(DataPoint(Option(v))))
 }
