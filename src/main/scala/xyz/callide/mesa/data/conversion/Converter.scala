@@ -58,6 +58,7 @@ object Converter {
       case v: String => v match {
         case "false" | "False" | "FALSE" | "0" => false
         case "true" | "True" | "TRUE" | "1" => true
+        case _ => throw InvalidConversionException[Boolean](v)
       }
       case v => throw InvalidConversionException[Boolean](v)
     }

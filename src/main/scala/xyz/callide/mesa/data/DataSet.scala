@@ -39,6 +39,13 @@ case class DataSet(header: DataHeader, fields: Vector[DataField]) {
   // validate input
   require(header.size == fields.length, "Length mismatch between header and fields")
   require(fields.tail.forall(field => field.length == fields.head.length), "Inconsistent row count")
+  require(fields.indices.forall(ind => fields(ind).form == header.form(header.name(ind))), "Data form mismatch")
+
+  /**
+    * Indicates whether or not there are any missing values in the data set
+    */
+
+  lazy val hasMissingValues: Boolean = fields.exists(field => field.hasMissingValues)
 
   /**
     * Provides the number of records contained in the data set
@@ -366,6 +373,14 @@ object DataSet {
 
     CsvLoader.readFromStream(getClass.getClassLoader.getResourceAsStream(name), delimiter)
   }
+
+  /**
+    * Reads a data set from a SQL result set
+    *
+    * @param results the result set
+    * @param set conversion set to use
+    * @return data set
+    */
 
   def fromResultSet(results: ResultSet)(implicit set: ConversionSet = ConversionSet()): DataSet = {
 

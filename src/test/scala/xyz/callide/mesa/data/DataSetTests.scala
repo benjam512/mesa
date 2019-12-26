@@ -49,6 +49,30 @@ class DataSetTests extends FlatSpec with DataSetUtil {
                                                        LocalDateTime.of(2018, 1, 3, 8, 0)))
   }
 
+  it should "correctly read from CSV with missing values" in {
+
+    val data = DataSet.fromCsvResource("data5.csv")
+    assert(data.header.fieldNames == List("id", "name", "age", "dob", "score", "pass", "time"))
+    assert(data.header.form("id") == DataForm.Long)
+    assert(data.header.form("name") == DataForm.String)
+    assert(data.header.form("age") == DataForm.Int)
+    assert(data.header.form("dob") == DataForm.LocalDate)
+    assert(data.header.form("score") == DataForm.Double)
+    assert(data.header.form("pass") == DataForm.Boolean)
+    assert(data.header.form("time") == DataForm.LocalDateTime)
+    assert(data("id").extract[Long] == Vector(12345678901L, 23456789012L, 34567890123L))
+    assert(data("name").extract[String] == Vector("bob", "joe", "sam"))
+    assert(data("age").points == Vector(19, null, 25).map(v => DataPoint(Option(v))))
+    assert(data("dob").extract[LocalDate] == Vector(LocalDate.of(2000, 1, 1),
+      LocalDate.of(1989, 3, 1),
+      LocalDate.of(1994, 2, 1)))
+    assert(data("score").points == Vector(null, 65.1, 73.9).map(v => DataPoint(Option(v))))
+    assert(data("pass").points == Vector(true, false, null).map(v => DataPoint(Option(v))))
+    assert(data("time").points == Vector(null,
+      LocalDateTime.of(2018, 1, 2, 14, 0),
+      LocalDateTime.of(2018, 1, 3, 8, 0)).map(v => DataPoint(Option(v))))
+  }
+
   it should "correctly count records" in {
 
     assert(data3.count == 4)
