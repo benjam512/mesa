@@ -19,7 +19,7 @@ package xyz.callide.mesa.data
 import java.io.InputStream
 import java.sql.ResultSet
 
-import xyz.callide.mesa.csv.CsvLoader
+import xyz.callide.mesa.csv.{CsvLoader, CsvWriter}
 import xyz.callide.mesa.data.conversion.ConversionSet
 import xyz.callide.mesa.ordering.OrderingDirection
 import xyz.callide.mesa.sql.ResultSetLoader
@@ -326,6 +326,11 @@ case class DataSet(header: DataHeader, fields: Vector[DataField]) {
       })
       println()
     }
+  }
+
+  def writeToCsv(path: String, delimiter: Char = ',', quote: Boolean = false): Unit = {
+
+    CsvWriter(path, delimiter, quote).write(this)
   }
 }
 
