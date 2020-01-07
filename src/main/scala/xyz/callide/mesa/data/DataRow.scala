@@ -47,3 +47,18 @@ case class DataRow(header: DataHeader, elements: Vector[Any]) {
 
   def map[A](f: DataPoint => A): Vector[A] = elements.map(v => f(DataPoint(Option(v))))
 }
+
+class DataRowIterator private [data] (header: DataHeader, fields: Vector[DataField]) extends Iterator[DataRow] {
+
+  private var iter = -1
+  override val length: Int = fields.head.length
+  require(fields.forall(field => field.length == length))
+
+  override def hasNext: Boolean = {iter + 1 < length}
+
+  override def next(): DataRow = {
+
+    iter += 1
+    DataRow(header, fields.map(field => field.raw(iter)))
+  }
+}

@@ -89,19 +89,11 @@ class DataSetTests extends FlatSpec with DataSetUtil {
     assert(data3.row(3) == DataRow(data3.header, Vector(456, true, 2.4)))
   }
 
-  it should "correctly map rows" in {
+  it should "correctly provide a row iterator" in {
 
-    assert(data3.mapRows(row => {
+    assert(data3.rows.map(row => {
       !row[Boolean]("B")
-    }) == Vector(true, false, true, false))
-  }
-
-  it should "correctly apply a function for each row" in {
-
-    var sum = 0
-    data3.forEachRow(row => sum += row[Int]("A"))
-
-    assert(sum == 1158)
+    }).toVector == Vector(true, false, true, false))
   }
 
   it should "correctly append a field" in {

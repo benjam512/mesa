@@ -7,6 +7,6 @@ object Test {
   def main(args: Array[String]): Unit = {
 
     val data = DataSet.fromCsvResource("data5.csv")
-    data.writeToCsv("/tmp/DATA.csv", delimiter = '|')
+    data.rows.foreach(row => println(row.elements))
   }
 }

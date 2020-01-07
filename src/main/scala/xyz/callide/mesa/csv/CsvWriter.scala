@@ -44,7 +44,7 @@ case class CsvWriter(path: String, delimiter: Char, quote: Boolean) {
       val delim = delimiter.toString
       val names = data.header.fieldNames
       writer.println((if (quote) names.map(name => "\"" + name + "\"") else names).mkString(delim))
-      data.forEachRow(row => {
+      data.rows.foreach(row => {
         val line = if (quote) {
           names.map(name => "\"" + row[String](name) + "\"").mkString(delim)
         } else names.map(name => row[String](name)).mkString(delim)

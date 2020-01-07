@@ -74,22 +74,12 @@ case class DataSet(header: DataHeader, fields: Vector[DataField]) {
   def row(ind: Int): DataRow = DataRow(header, fields.map(field => field.raw(ind)))
 
   /**
-    * Maps the rows of this data set to the specified output
+    * Provides the rows of the data set as an iterator
     *
-    * @param f mapping function
-    * @tparam A result type
-    * @return mapped row output
+    * @return data row iterator
     */
 
-  def mapRows[A](f: DataRow => A): Vector[A] = Vector.range(0, count).map(i => f(row(i)))
-
-  /**
-    * Applies the provided function to each row in the data set
-    *
-    * @param f the function to apply
-    */
-
-  def forEachRow(f: DataRow => Unit): Unit = for (i <- 0 until count) f(row(i))
+  def rows: Iterator[DataRow] = new DataRowIterator(header, fields)
 
   /**
     * Appends the provided field to the data set
