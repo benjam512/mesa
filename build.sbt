@@ -1,6 +1,6 @@
 name := "mesa"
 
-version := "0.3.0-SNAPSHOT"
+version := "1.0.0"
 
 organization := "xyz.callide"
 
