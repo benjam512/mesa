@@ -190,48 +190,48 @@ object CsvLoader {
         new BooleanFieldBuilder(ArrayBuffer.range(0, builder.length).map(i => {
           builder(i) match {
             case null | None => Option.empty
-            case v => Some(set.booleanConverter.convert(v))
+            case Some(v) => Some(set.booleanConverter.convert(v))
           }
         }))
       case Some(DataForm.LocalDate) =>
         new LocalDateFieldBuilder(ArrayBuffer.range(0, builder.length).map(i => {
           builder(i) match {
             case null | None => Option.empty
-            case v => Some(set.localDateConverter.convert(v))
+            case Some(v) => Some(set.localDateConverter.convert(v))
           }
         }))
       case Some(DataForm.LocalDateTime) =>
         new LocalDateTimeFieldBuilder(ArrayBuffer.range(0, builder.length).map(i => {
           builder(i) match {
             case null | None => Option.empty
-            case v => Some(set.localDateTimeConverter.convert(v))
+            case Some(v) => Some(set.localDateTimeConverter.convert(v))
           }
         }))
       case Some(DataForm.Double) =>
         new DoubleFieldBuilder(ArrayBuffer.range(0, builder.length).map(i => {
           builder(i) match {
             case null | None => Option.empty
-            case v => Some(set.doubleConverter.convert(v))
+            case Some(v) => Some(set.doubleConverter.convert(v))
           }
         }))
       case Some(DataForm.Int) =>
         new IntFieldBuilder(ArrayBuffer.range(0, builder.length).map(i => {
           builder(i) match {
             case null | None => Option.empty
-            case v => Some(set.intConverter.convert(v))
+            case Some(v) => Some(set.intConverter.convert(v))
           }
         }))
       case Some(DataForm.Long) =>
         new LongFieldBuilder(ArrayBuffer.range(0, builder.length).map(i => {
           builder(i) match {
             case null | None => Option.empty
-            case v => Some(set.longConverter.convert(v))
+            case Some(v) => Some(set.longConverter.convert(v))
           }
         }))
       case _ => new StringFieldBuilder(ArrayBuffer.range(0, builder.length).map(i => {
         builder(i) match {
           case null | None => Option.empty
-          case v => Some(set.stringConverter.convert(v))
+          case Some(v) => Some(set.stringConverter.convert(v))
         }
       }))
     }

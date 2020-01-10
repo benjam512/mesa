@@ -10,7 +10,8 @@ The library can be built with SBT >= 1.2.8
 
 The main abstraction is the `DataSet` class, which is an immutable container for a set of tabular data. Data can be loaded either
 from a CSV file or from a JDBC `ResultSet`. Once instantiated, we can perform various SQL-like operations on a `DataSet` instance,
-such as filtering and grouping. Note that `DataSet`s are immutable objects, and thus all operations result in a new instance.
+such as filtering and grouping. Note that `DataSet`s are immutable objects, and thus all transformations result in a new instance
+being created.
 
 ## Data Forms
 
@@ -91,3 +92,54 @@ field.point(0).get[Double] // Some(83.5)
 field.point(3).as[Double] // runtime error!
 field.point(3).get[Double] // None
 ```
+
+### Custom Conversions
+
+Let's say that we want to implement a custom date converter like this:
+
+```scala
+object CustomLocalDateConverter extends Converter[LocalDate] {
+  private val formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy")
+  override def convert(value: Any): LocalDate = value match {
+    case v: LocalDate => v
+    case v: LocalDateTime => v.toLocalDate
+    case v: String => LocalDate.parse(v, formatter)
+    case v => throw InvalidConversionException[LocalDate](v)
+  }
+}
+```
+
+We have a couple of options for using this converter. One method would be to create a new conversion set which uses
+this custom converter at the time of loading the data.
+
+```scala
+implicit val conversion: ConversionSet = ConversionSet().copy(localDateConverter = CustomLocalDateConverter)
+val data = DataSet.fromCsvFile("/tmp/data.csv")
+```
+
+The other option is to load the data without modification, and use the converter when extracting that field.
+
+```scala
+implicit val dateConverter: Converter[LocalDate] = CustomLocalDateConverter
+val data = DataSet.fromCsvFile("/tmp/data.csv")
+data("date").extract[LocalDate]
+```
+
+Note that in either case the conversion set or custom converter can be passed in explicitly, but in the code above we
+are setting it as an implicit value.
+
+### Previewing Data
+
+Once data is loaded into a `DataSet`, we can use the `preview()` method to print the first few lines to the console. The
+number of lines to be displayed defaults to 10, but can be manually specified.
+
+
+    ====================================================================
+         id       name  age     dob      score  pass         time       
+    ====================================================================
+     12345678901  bob   19   2000-01-01  83.4   true   2018-01-01T12:00 
+     23456789012  joe   29   1989-03-01  65.1   false  2018-01-02T14:00 
+     34567890123  sam   25   1994-02-01  73.9   true   2018-01-03T08:00
+
+
+
