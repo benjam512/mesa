@@ -30,15 +30,62 @@ case class DataHeader(private val fieldColumn: Map[String, Int],
   require(fieldColumn.size == fieldName.size, "Column map and name map size mismatch")
   require(fieldColumn.size == fieldForm.size, "Column map and form map size mismatch")
 
+  /**
+    * Provides the column index of the specified field. If the specified name fails to match a field, an exception is
+    * thrown.
+    *
+    * @param name the field name
+    * @return column index
+    */
+
   def column(name: String): Int = fieldColumn(name)
+
+  /**
+    * Provides the column index of the specified field as an optional value. If the specified name fails to match a
+    * field, then an empty option is returned.
+    *
+    * @param name the field name
+    * @return column index
+    */
 
   def getColumn(name: String): Option[Int] = fieldColumn.get(name)
 
+  /**
+    * Provides the field name at the specified index. If the specified index does not exist, an exception is thrown.
+    *
+    * @param column the column index
+    * @return field name
+    */
+
   def name(column: Int): String = fieldName(column)
+
+  /**
+    * Provides the field name at the specified index. If the specified index does not exist, then an empty option is
+    * returned.
+    *
+    * @param column the column index
+    * @return field name
+    */
 
   def getName(column: Int): Option[String] = fieldName.get(column)
 
+  /**
+    * Provides the data form of the specified field. If the specified name fails to match a field, then an exception
+    * is thrown.
+    *
+    * @param name the field name
+    * @return data form
+    */
+
   def form(name: String): DataForm = fieldForm(name)
+
+  /**
+    * Provides the data form of the specified field as an optional value. If the specified name fails to match a
+    * field, then an empty option is returned.
+    *
+    * @param name the field name
+    * @return data form
+    */
 
   def getForm(name: String): Option[DataForm] = fieldForm.get(name)
 

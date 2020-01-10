@@ -43,13 +43,13 @@ class ResultSetLoaderTests extends FlatSpec {
                           LocalDateTime.of(1999, 12, 29, 7, 0), LocalDateTime.of(1999, 12, 28, 7, 0),
                           LocalDateTime.of(1999, 12, 27, 7, 0))
 
-    val fields = Vector(BooleanField(Array(true, false, false, true, true)),
-                        DoubleField(Array(1.234, 2.345, 3.456, 4.567, 5.678)),
-                        IntField(Array(2, 4, 6, 8, 10)),
-                        LongField(Array(1, 3, 5, 7, 9)),
-                        StringField(Array("abc", "def", "ghi", "jkl", "mno")),
-                        LocalDateField(dates),
-                        LocalDateTimeField(dateTimes))
+    val fields = Vector(BooleanField(Array(true, false, false, true, true):_*),
+                        DoubleField(Array(1.234, 2.345, 3.456, 4.567, 5.678):_*),
+                        IntField(Array(2, 4, 6, 8, 10):_*),
+                        LongField(Array(1L, 3, 5, 7, 9):_*),
+                        StringField(Array("abc", "def", "ghi", "jkl", "mno"):_*),
+                        LocalDateField(dates:_*),
+                        LocalDateTimeField(dateTimes:_*))
 
     assert(data.fields == fields)
   }

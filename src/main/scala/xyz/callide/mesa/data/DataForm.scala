@@ -26,8 +26,18 @@ import scala.util.{Success, Try}
 
 trait DataForm {
 
+  /**
+    * String data form name
+    *
+    * @return name
+    */
+
   def name: String
 }
+
+/**
+  * Provides static functionality
+  */
 
 object DataForm {
 
@@ -53,11 +63,31 @@ object DataForm {
     override def name: String = "String"
   }
 
+  /**
+    * Used to infer data forms from un-typed sources like CSV files
+    *
+    * @param set conversion set
+    */
+
   class FormInference(set: ConversionSet) {
 
+    // current inferred form
     private var form: Option[DataForm] = None
 
+    /**
+      * Provides the current inferred form
+      *
+      * @return current form
+      */
+
     def getForm: Option[DataForm] = form
+
+    /**
+      * Attempts to infer the data form from the provided input string value. The logic works by attempting conversions
+      * from the most specific to the most general data forms, using the String form as the final fallback.
+      *
+      * @param input data value as a string
+      */
 
     def infer(input: String): Unit = {
 

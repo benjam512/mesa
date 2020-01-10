@@ -26,7 +26,19 @@ import xyz.callide.mesa.data.{DataForm, DataHeader, DataSet}
 
 import scala.collection.mutable.ArrayBuffer
 
+/**
+  * Loads data from a SQL result set
+  */
+
 object ResultSetLoader {
+
+  /**
+    * Constructs a data set from a SQL result set
+    *
+    * @param results the result set
+    * @param set the conversion set
+    * @return data set
+    */
 
   def read(results: ResultSet)(implicit set: ConversionSet): DataSet = {
 

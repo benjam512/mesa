@@ -318,6 +318,14 @@ case class DataSet(header: DataHeader, fields: Vector[DataField]) {
     }
   }
 
+  /**
+    * Writes the data set to file as a CSV
+    *
+    * @param path the file path
+    * @param delimiter the field delimiter
+    * @param quote whether or not to place elements in quotes
+    */
+
   def writeToCsv(path: String, delimiter: Char = ',', quote: Boolean = false): Unit = {
 
     CsvWriter(path, delimiter, quote).write(this)
@@ -352,7 +360,10 @@ object DataSet {
     */
 
   def fromCsvStream(stream: InputStream, delimiter: Char = ',')
-                   (implicit set: ConversionSet = ConversionSet()): DataSet = CsvLoader.readFromStream(stream, delimiter)
+                   (implicit set: ConversionSet = ConversionSet()): DataSet = {
+
+    CsvLoader.readFromStream(stream, delimiter)
+  }
 
   /**
     * Reads in a CSV from resource

@@ -16,37 +16,21 @@
 
 package xyz.callide.mesa.data
 
+import java.io.{BufferedReader, File, FileReader}
 import java.time.{LocalDate, LocalDateTime}
 
 import org.scalatest.FlatSpec
+import xyz.callide.mesa.csv.{CsvTest, CsvWriter}
 import xyz.callide.mesa.ordering.OrderingDirection
 
-class DataSetTests extends FlatSpec with DataSetUtil {
+class DataSetTests extends FlatSpec with DataSetUtil with CsvTest {
 
   behavior of "DataSet"
 
   it should "correctly read from CSV" in {
 
     val data = DataSet.fromCsvResource("data.csv")
-    assert(data.header.fieldNames == List("id", "name", "age", "dob", "score", "pass", "time"))
-    assert(data.header.form("id") == DataForm.Long)
-    assert(data.header.form("name") == DataForm.String)
-    assert(data.header.form("age") == DataForm.Int)
-    assert(data.header.form("dob") == DataForm.LocalDate)
-    assert(data.header.form("score") == DataForm.Double)
-    assert(data.header.form("pass") == DataForm.Boolean)
-    assert(data.header.form("time") == DataForm.LocalDateTime)
-    assert(data("id").extract[Long] == Vector(12345678901L, 23456789012L, 34567890123L))
-    assert(data("name").extract[String] == Vector("bob", "joe", "sam"))
-    assert(data("age").extract[Int] == Vector(19, 29, 25))
-    assert(data("dob").extract[LocalDate] == Vector(LocalDate.of(2000, 1, 1),
-                                                  LocalDate.of(1989, 3, 1),
-                                                  LocalDate.of(1994, 2, 1)))
-    assert(data("score").extract[Double] == Vector(83.4, 65.1, 73.9))
-    assert(data("pass").extract[Boolean] == Vector(true, false, true))
-    assert(data("time").extract[LocalDateTime] == Vector(LocalDateTime.of(2018, 1, 1, 12, 0),
-                                                       LocalDateTime.of(2018, 1, 2, 14, 0),
-                                                       LocalDateTime.of(2018, 1, 3, 8, 0)))
+    testCsvLoad(data)
   }
 
   it should "correctly read from CSV with missing values" in {
@@ -71,6 +55,23 @@ class DataSetTests extends FlatSpec with DataSetUtil {
     assert(data("time").points == Vector(null,
       LocalDateTime.of(2018, 1, 2, 14, 0),
       LocalDateTime.of(2018, 1, 3, 8, 0)).map(v => DataPoint(Option(v))))
+  }
+
+  it should "correctly write to a CSV" in {
+
+    val fields = Vector(BooleanField(true, false, true), IntField(1, 3, 2), StringField("a", "b", "c"))
+    val header = DataHeader(List(("BF", DataForm.Boolean), ("IF", DataForm.Int), ("SF", DataForm.String)))
+    val data = DataSet(header, fields)
+    val file = File.createTempFile("test-csv", ".csv")
+    data.writeToCsv(file.getAbsolutePath) // no quotes
+    val reader1 = new BufferedReader(new FileReader(file))
+    assert(reader1.lines().toArray.map(_.toString).mkString("\n") == "BF,IF,SF\ntrue,1,a\nfalse,3,b\ntrue,2,c")
+    reader1.close()
+    data.writeToCsv(file.getAbsolutePath, quote = true) // no quotes
+    val reader2 = new BufferedReader(new FileReader(file))
+    assert(reader2.lines().toArray.map(_.toString).mkString("\n") ==
+      "\"BF\",\"IF\",\"SF\"\n\"true\",\"1\",\"a\"\n\"false\",\"3\",\"b\"\n\"true\",\"2\",\"c\"")
+    reader2.close()
   }
 
   it should "correctly count records" in {
@@ -98,7 +99,7 @@ class DataSetTests extends FlatSpec with DataSetUtil {
 
   it should "correctly append a field" in {
 
-    val field = IntField(Array(1, 2, 3, 4))
+    val field = IntField(1, 2, 3, 4)
     val augmented = data3.append("D", field)
     assert(augmented.header.fieldNames == List("A", "B", "C", "D"))
     assert(augmented.header.form("A") == DataForm.Int)
@@ -110,7 +111,7 @@ class DataSetTests extends FlatSpec with DataSetUtil {
 
   it should "correctly prepend a field" in {
 
-    val field = IntField(Array(1, 2, 3, 4))
+    val field = IntField(1, 2, 3, 4)
     val augmented = data3.prepend("D", field)
     assert(augmented.header.fieldNames == List("D", "A", "B", "C"))
     assert(augmented.header.form("A") == DataForm.Int)

@@ -26,7 +26,24 @@ import xyz.callide.mesa.data.conversion.Converter
 
 case class DataPoint(value: Option[Any]) {
 
+  /**
+    * Converts the data point to the specified type, and makes an assumption that the value exists. Otherwise, an
+    * exception is thrown.
+    *
+    * @param converter implicit converter
+    * @tparam A desired data type
+    * @return converted point
+    */
+
   def as[A](implicit converter: Converter[A]): A = converter.convert(value.get)
+
+  /**
+    * Converts the data point to the specified type, retaining its optional status.
+    *
+    * @param converter implicit converter
+    * @tparam A desired data type
+    * @return converted point
+    */
 
   def get[A](implicit converter: Converter[A]): Option[A] = value.map(converter.convert)
 }
