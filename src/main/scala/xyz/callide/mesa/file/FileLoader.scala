@@ -14,83 +14,32 @@
    limitations under the License.
   */
 
-package xyz.callide.mesa.csv
+package xyz.callide.mesa.file
 
-import java.io.{File, InputStream}
-
-import com.univocity.parsers.common.{ParsingContext, ResultIterator}
-import com.univocity.parsers.csv.{CsvParserSettings, UnescapedQuoteHandling}
+import xyz.callide.mesa.data.{DataForm, DataHeader, DataSet}
+import xyz.callide.mesa.data.DataForm.FormInference
 import xyz.callide.mesa.data.builder.DataFieldBuilder
 import xyz.callide.mesa.data.builder.DataFieldBuilder.{BooleanFieldBuilder, DoubleFieldBuilder, IntFieldBuilder, LocalDateFieldBuilder, LocalDateTimeFieldBuilder, LongFieldBuilder, StringFieldBuilder}
 import xyz.callide.mesa.data.conversion.ConversionSet
-import xyz.callide.mesa.data.{DataForm, DataHeader, DataSet}
-import xyz.callide.mesa.data.DataForm.FormInference
 
 import scala.collection.mutable.ArrayBuffer
 import scala.util.{Failure, Try}
 
 /**
-  * Provides functionality for loading CSV data
+  * Provides functionality for loading data sets from flat files
   */
 
-object CsvLoader {
-
-  /**
-    * Reads from the provided input stream
-    *
-    * @param stream the input stream
-    * @param delimiter column separator
-    * @param header denotes whether or not the CSV file contains a header row
-    * @param set conversion set
-    * @return data set
-    */
-
-  def readFromStream(stream: InputStream,
-                     delimiter: Char = ',',
-                     header: Boolean = true)(implicit set: ConversionSet): DataSet = {
-
-    val settings = new CsvParserSettings()
-    settings.getFormat.setDelimiter(delimiter)
-    settings.setUnescapedQuoteHandling(UnescapedQuoteHandling.STOP_AT_CLOSING_QUOTE)
-    settings.setMaxCharsPerColumn(65536)
-
-    val parser = new com.univocity.parsers.csv.CsvParser(settings)
-    read(parser.iterate(stream).iterator(), header)
-  }
-
-  /**
-    * Reads from the provided file path
-    *
-    * @param path the file path
-    * @param delimiter column separator
-    * @param header denotes whether or not the CSV file contains a header row
-    * @param set conversion set
-    * @return data set
-    */
-
-  def readFromFile(path: String,
-                   delimiter: Char = ',',
-                   header: Boolean = true)(implicit set: ConversionSet): DataSet = {
-
-    val settings = new CsvParserSettings()
-    settings.getFormat.setDelimiter(delimiter)
-    settings.setUnescapedQuoteHandling(UnescapedQuoteHandling.STOP_AT_CLOSING_QUOTE)
-    settings.setMaxCharsPerColumn(65536)
-
-    val parser = new com.univocity.parsers.csv.CsvParser(settings)
-    read(parser.iterate(new File(path)).iterator(), header)
-  }
+trait FileLoader {
 
   /**
     * Reads from the provided iterator
     *
-    * @param iterator result iterator
+    * @param iterator row iterator
     * @param set conversion set
     * @return data set
     */
 
-  private def read(iterator: ResultIterator[Array[String], ParsingContext],
-                   header: Boolean)(implicit set: ConversionSet): DataSet = {
+  protected def read(iterator: RowIterator, header: Boolean)(implicit set: ConversionSet): DataSet = {
 
     val (names, firstLine) = if (iterator.hasNext) {
       val head = if (header) Some(iterator.next) else None
@@ -127,7 +76,7 @@ object CsvLoader {
     * @return initial form inference estimates
     */
 
-  private def inferForms(line: Array[String])(implicit set: ConversionSet): Array[FormInference] = {
+  protected def inferForms(line: Array[String])(implicit set: ConversionSet): Array[FormInference] = {
 
     line.map(elem => {
       val fi = new FormInference(set)
@@ -145,8 +94,8 @@ object CsvLoader {
     * @return data set
     */
 
-  private def initBuilders(forms: Array[FormInference], line: Array[String])
-                          (implicit set: ConversionSet): Array[DataFieldBuilder] = {
+  protected def initBuilders(forms: Array[FormInference], line: Array[String])
+                            (implicit set: ConversionSet): Array[DataFieldBuilder] = {
 
     forms.zipWithIndex.map({case (inf, ind) =>
       val elem = line(ind) match {
@@ -183,7 +132,7 @@ object CsvLoader {
     * @return updated field builder
     */
 
-  private def switch(builder: DataFieldBuilder, inf: FormInference)(implicit set: ConversionSet): DataFieldBuilder = {
+  protected def switch(builder: DataFieldBuilder, inf: FormInference)(implicit set: ConversionSet): DataFieldBuilder = {
 
     inf.getForm match {
       case Some(DataForm.Boolean) =>

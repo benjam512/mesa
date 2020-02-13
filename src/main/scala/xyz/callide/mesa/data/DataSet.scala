@@ -19,7 +19,7 @@ package xyz.callide.mesa.data
 import java.io.InputStream
 import java.sql.ResultSet
 
-import xyz.callide.mesa.csv.{CsvLoader, CsvWriter}
+import xyz.callide.mesa.file.{CsvLoader, CsvWriter, ExcelLoader}
 import xyz.callide.mesa.data.conversion.ConversionSet
 import xyz.callide.mesa.ordering.OrderingDirection
 import xyz.callide.mesa.sql.ResultSetLoader
@@ -378,6 +378,11 @@ object DataSet {
                      (implicit set: ConversionSet = ConversionSet()): DataSet = {
 
     CsvLoader.readFromStream(getClass.getClassLoader.getResourceAsStream(name), delimiter)
+  }
+
+  def fromExcelFile(path: String, sheet: Int)(implicit set: ConversionSet = ConversionSet()): DataSet = {
+
+    ExcelLoader.readFromFile(path)
   }
 
   /**

@@ -20,17 +20,17 @@ import java.io.{BufferedReader, File, FileReader}
 import java.time.{LocalDate, LocalDateTime}
 
 import org.scalatest.FlatSpec
-import xyz.callide.mesa.csv.{CsvTest, CsvWriter}
+import xyz.callide.mesa.file.{FileTest, CsvWriter}
 import xyz.callide.mesa.ordering.OrderingDirection
 
-class DataSetTests extends FlatSpec with DataSetUtil with CsvTest {
+class DataSetTests extends FlatSpec with DataSetUtil with FileTest {
 
   behavior of "DataSet"
 
   it should "correctly read from CSV" in {
 
     val data = DataSet.fromCsvResource("data.csv")
-    testCsvLoad(data)
+    testCompleteFile(data)
   }
 
   it should "correctly read from CSV with missing values" in {

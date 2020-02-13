@@ -1,6 +1,6 @@
 name := "mesa"
 
-version := "1.0.0"
+version := "1.1.0"
 
 organization := "xyz.callide"
 
@@ -11,3 +11,6 @@ libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.7" % Test
 
 // https://mvnrepository.com/artifact/com.univocity/univocity-parsers
 libraryDependencies += "com.univocity" % "univocity-parsers" % "2.8.2"
+
+// https://mvnrepository.com/artifact/org.apache.poi/poi
+libraryDependencies += "org.apache.poi" % "poi-ooxml" % "4.1.1"

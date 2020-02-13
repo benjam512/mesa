@@ -14,7 +14,7 @@
    limitations under the License.
   */
 
-package xyz.callide.mesa.csv
+package xyz.callide.mesa.file
 
 import java.io.PrintWriter
 
