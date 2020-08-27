@@ -16,6 +16,8 @@
 
 package xyz.callide.mesa.file
 
+import java.io.File
+
 import org.scalatest.FlatSpec
 import xyz.callide.mesa.data.conversion.ConversionSet
 
@@ -27,6 +29,8 @@ class CsvLoaderTests extends FlatSpec with FileTest {
 
     testCompleteFile(CsvLoader.readFromFile(getClass.getClassLoader.getResource("data.csv").getFile)(ConversionSet()))
     testPartialFile(CsvLoader.readFromFile(getClass.getClassLoader.getResource("data5.csv").getFile)(ConversionSet()))
+    testCompleteFile(CsvLoader.readFromFile(new File(getClass.getClassLoader.getResource("data.csv").toURI), ',', true)(ConversionSet()))
+    testPartialFile(CsvLoader.readFromFile(new File(getClass.getClassLoader.getResource("data5.csv").toURI), ',', true)(ConversionSet()))
   }
 
   it should "read from stream" in {

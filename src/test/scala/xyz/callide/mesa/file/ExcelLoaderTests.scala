@@ -16,6 +16,8 @@
 
 package xyz.callide.mesa.file
 
+import java.io.File
+
 import org.scalatest.FlatSpec
 import xyz.callide.mesa.data.conversion.ConversionSet
 
@@ -27,5 +29,7 @@ class ExcelLoaderTests extends FlatSpec with FileTest {
 
     testCompleteFile(ExcelLoader.readFromFile(getClass.getClassLoader.getResource("data.xlsx").getFile)(ConversionSet()))
     testPartialFile(ExcelLoader.readFromFile(getClass.getClassLoader.getResource("data5.xlsx").getFile)(ConversionSet()))
+    testCompleteFile(ExcelLoader.readFromFile(new File(getClass.getClassLoader.getResource("data.xlsx").toURI), 0, true)(ConversionSet()))
+    testPartialFile(ExcelLoader.readFromFile(new File(getClass.getClassLoader.getResource("data5.xlsx").toURI), 0, true)(ConversionSet()))
   }
 }

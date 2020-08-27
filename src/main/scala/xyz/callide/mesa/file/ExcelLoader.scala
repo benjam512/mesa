@@ -43,7 +43,24 @@ object ExcelLoader extends FileLoader {
                    sheet: Int = 0,
                    header: Boolean = true)(implicit set: ConversionSet): DataSet = {
 
-    val stream = new FileInputStream(new File(path))
+    readFromFile(new File(path), sheet, header)
+  }
+
+  /**
+    * Reads from the provided file path
+    *
+    * @param file the input file
+    * @param sheet the sheet number in the workbook, indexed at zero
+    * @param header denotes whether or not the Excel file contains a header row
+    * @param set conversion set
+    * @return data set
+    */
+
+  def readFromFile(file: File,
+                   sheet: Int,
+                   header: Boolean)(implicit set: ConversionSet): DataSet = {
+
+    val stream = new FileInputStream(file)
     val workbook = new XSSFWorkbook(stream)
     val colDim = workbook.getSheetAt(sheet).iterator.asScala.map(row => row.getLastCellNum).max.toInt
     read(new ExcelRowIterator(workbook.getSheetAt(sheet).iterator, colDim), header)

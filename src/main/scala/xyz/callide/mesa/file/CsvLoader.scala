@@ -66,12 +66,29 @@ object CsvLoader extends FileLoader {
                    delimiter: Char = ',',
                    header: Boolean = true)(implicit set: ConversionSet): DataSet = {
 
+    readFromFile(new File(path), delimiter, header)
+  }
+
+  /**
+    * Reads from the provided file path
+    *
+    * @param file the input file
+    * @param delimiter column separator
+    * @param header denotes whether or not the CSV file contains a header row
+    * @param set conversion set
+    * @return data set
+    */
+
+  def readFromFile(file: File,
+                   delimiter: Char,
+                   header: Boolean)(implicit set: ConversionSet): DataSet = {
+
     val settings = new CsvParserSettings()
     settings.getFormat.setDelimiter(delimiter)
     settings.setUnescapedQuoteHandling(UnescapedQuoteHandling.STOP_AT_CLOSING_QUOTE)
     settings.setMaxCharsPerColumn(65536)
 
     val parser = new com.univocity.parsers.csv.CsvParser(settings)
-    read(new CsvRowIterator(parser.iterate(new File(path)).iterator()), header)
+    read(new CsvRowIterator(parser.iterate(file).iterator()), header)
   }
 }
