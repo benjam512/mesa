@@ -27,8 +27,8 @@ class CsvLoaderTests extends FlatSpec with FileTest {
 
   it should "read from file" in {
 
-    testCompleteFile(CsvLoader.readFromFile(getClass.getClassLoader.getResource("data.csv").getFile)(ConversionSet()))
-    testPartialFile(CsvLoader.readFromFile(getClass.getClassLoader.getResource("data5.csv").getFile)(ConversionSet()))
+    testCompleteFile(CsvLoader.readFromPath(getClass.getClassLoader.getResource("data.csv").getFile)(ConversionSet()))
+    testPartialFile(CsvLoader.readFromPath(getClass.getClassLoader.getResource("data5.csv").getFile)(ConversionSet()))
     testCompleteFile(CsvLoader.readFromFile(new File(getClass.getClassLoader.getResource("data.csv").toURI), ',', true)(ConversionSet()))
     testPartialFile(CsvLoader.readFromFile(new File(getClass.getClassLoader.getResource("data5.csv").toURI), ',', true)(ConversionSet()))
   }

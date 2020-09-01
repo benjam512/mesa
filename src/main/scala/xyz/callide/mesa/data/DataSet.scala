@@ -16,7 +16,7 @@
 
 package xyz.callide.mesa.data
 
-import java.io.InputStream
+import java.io.{File, InputStream}
 import java.sql.ResultSet
 
 import xyz.callide.mesa.file.{CsvLoader, CsvWriter, ExcelLoader}
@@ -339,7 +339,7 @@ case class DataSet(header: DataHeader, fields: Vector[DataField]) {
 object DataSet {
 
   /**
-    * Reads in a CSV from file
+    * Reads in a CSV from file path
     *
     * @param path CSV file path
     * @param delimiter column separator
@@ -347,8 +347,23 @@ object DataSet {
     * @return data set
     */
 
-  def fromCsvFile(path: String, delimiter: Char = ',')
-                 (implicit set: ConversionSet = ConversionSet()): DataSet = CsvLoader.readFromFile(path, delimiter)
+  def fromCsvPath(path: String, delimiter: Char = ',')
+                 (implicit set: ConversionSet = ConversionSet()): DataSet = CsvLoader.readFromPath(path, delimiter)
+
+  /**
+    * Reads in a CSV from file
+    *
+    * @param file CSV file
+    * @param delimiter column separator
+    * @param set conversion set to use
+    * @return data set
+    */
+
+  def fromCsvFile(file: File, delimiter: Char = ',')
+                 (implicit set: ConversionSet = ConversionSet()): DataSet = {
+
+    CsvLoader.readFromFile(file, delimiter, header = true)
+  }
 
   /**
     * Reads in a CSV from a stream

@@ -62,7 +62,7 @@ object CsvLoader extends FileLoader {
     * @return data set
     */
 
-  def readFromFile(path: String,
+  def readFromPath(path: String,
                    delimiter: Char = ',',
                    header: Boolean = true)(implicit set: ConversionSet): DataSet = {
 
@@ -70,7 +70,7 @@ object CsvLoader extends FileLoader {
   }
 
   /**
-    * Reads from the provided file path
+    * Reads from the provided file
     *
     * @param file the input file
     * @param delimiter column separator
