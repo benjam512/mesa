@@ -347,8 +347,11 @@ object DataSet {
     * @return data set
     */
 
-  def fromCsvPath(path: String, delimiter: Char = ',')
-                 (implicit set: ConversionSet = ConversionSet()): DataSet = CsvLoader.readFromPath(path, delimiter)
+  def fromCsvPath(path: String, delimiter: Char = ',', comment: Option[Char] = None)
+                 (implicit set: ConversionSet = ConversionSet()): DataSet = {
+
+    CsvLoader.readFromPath(path, delimiter, comment = comment)
+  }
 
   /**
     * Reads in a CSV from file
@@ -359,10 +362,10 @@ object DataSet {
     * @return data set
     */
 
-  def fromCsvFile(file: File, delimiter: Char = ',')
+  def fromCsvFile(file: File, delimiter: Char = ',', comment: Option[Char] = None)
                  (implicit set: ConversionSet = ConversionSet()): DataSet = {
 
-    CsvLoader.readFromFile(file, delimiter, header = true)
+    CsvLoader.readFromFile(file, delimiter, header = true, comment = comment)
   }
 
   /**
@@ -374,10 +377,10 @@ object DataSet {
     * @return data set
     */
 
-  def fromCsvStream(stream: InputStream, delimiter: Char = ',')
+  def fromCsvStream(stream: InputStream, delimiter: Char = ',', comment: Option[Char] = None)
                    (implicit set: ConversionSet = ConversionSet()): DataSet = {
 
-    CsvLoader.readFromStream(stream, delimiter)
+    CsvLoader.readFromStream(stream, delimiter, comment = comment)
   }
 
   /**
@@ -389,11 +392,20 @@ object DataSet {
     * @return data set
     */
 
-  def fromCsvResource(name: String, delimiter: Char = ',')
+  def fromCsvResource(name: String, delimiter: Char = ',', comment: Option[Char] = None)
                      (implicit set: ConversionSet = ConversionSet()): DataSet = {
 
-    CsvLoader.readFromStream(getClass.getClassLoader.getResourceAsStream(name), delimiter)
+    CsvLoader.readFromStream(getClass.getClassLoader.getResourceAsStream(name), delimiter, comment = comment)
   }
+
+  /**
+    * Reads in an Excel file
+    *
+    * @param path the file path
+    * @param sheet the sheet number in the workbook, indexed at zero
+    * @param set conversion set to use
+    * @return data set
+    */
 
   def fromExcelFile(path: String, sheet: Int)(implicit set: ConversionSet = ConversionSet()): DataSet = {
 

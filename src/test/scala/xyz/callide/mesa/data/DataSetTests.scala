@@ -57,6 +57,13 @@ class DataSetTests extends FlatSpec with DataSetUtil with FileTest {
       LocalDateTime.of(2018, 1, 3, 8, 0)).map(v => DataPoint(Option(v))))
   }
 
+  it should "correctly read from a CSV with a comment char specified" in {
+
+    val data = DataSet.fromCsvResource("data6.csv", comment = Some('#'))
+    assert(data.count == 1)
+    assert(data.row(0)[String]("Col-A") == "ABC")
+  }
+
   it should "correctly write to a CSV" in {
 
     val fields = Vector(BooleanField(true, false, true), IntField(1, 3, 2), StringField("a", "b", "c"))

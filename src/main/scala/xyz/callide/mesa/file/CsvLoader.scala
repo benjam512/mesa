@@ -35,20 +35,17 @@ object CsvLoader extends FileLoader {
     * @param stream the input stream
     * @param delimiter column separator
     * @param header denotes whether or not the CSV file contains a header row
+    * @param comment denotes an optional character to act as a comment marker
     * @param set conversion set
     * @return data set
     */
 
   def readFromStream(stream: InputStream,
                      delimiter: Char = ',',
-                     header: Boolean = true)(implicit set: ConversionSet): DataSet = {
+                     header: Boolean = true,
+                     comment: Option[Char] = None)(implicit set: ConversionSet): DataSet = {
 
-    val settings = new CsvParserSettings()
-    settings.getFormat.setDelimiter(delimiter)
-    settings.setUnescapedQuoteHandling(UnescapedQuoteHandling.STOP_AT_CLOSING_QUOTE)
-    settings.setMaxCharsPerColumn(65536)
-
-    val parser = new com.univocity.parsers.csv.CsvParser(settings)
+    val parser = buildParser(delimiter, comment)
     read(new CsvRowIterator(parser.iterate(stream).iterator()), header)
   }
 
@@ -58,15 +55,17 @@ object CsvLoader extends FileLoader {
     * @param path the file path
     * @param delimiter column separator
     * @param header denotes whether or not the CSV file contains a header row
+    * @param comment denotes an optional character to act as a comment marker
     * @param set conversion set
     * @return data set
     */
 
   def readFromPath(path: String,
                    delimiter: Char = ',',
-                   header: Boolean = true)(implicit set: ConversionSet): DataSet = {
+                   header: Boolean = true,
+                   comment: Option[Char] = None)(implicit set: ConversionSet): DataSet = {
 
-    readFromFile(new File(path), delimiter, header)
+    readFromFile(new File(path), delimiter, header, comment)
   }
 
   /**
@@ -75,20 +74,28 @@ object CsvLoader extends FileLoader {
     * @param file the input file
     * @param delimiter column separator
     * @param header denotes whether or not the CSV file contains a header row
+    * @param comment denotes an optional character to act as a comment marker
     * @param set conversion set
     * @return data set
     */
 
   def readFromFile(file: File,
                    delimiter: Char,
-                   header: Boolean)(implicit set: ConversionSet): DataSet = {
+                   header: Boolean,
+                   comment: Option[Char])(implicit set: ConversionSet): DataSet = {
+
+    val parser = buildParser(delimiter, comment)
+    read(new CsvRowIterator(parser.iterate(file).iterator()), header)
+  }
+
+  private def buildParser(delimiter: Char, comment: Option[Char]): com.univocity.parsers.csv.CsvParser = {
 
     val settings = new CsvParserSettings()
     settings.getFormat.setDelimiter(delimiter)
     settings.setUnescapedQuoteHandling(UnescapedQuoteHandling.STOP_AT_CLOSING_QUOTE)
+    settings.getFormat.setComment(comment.getOrElse('\0'))
     settings.setMaxCharsPerColumn(65536)
 
-    val parser = new com.univocity.parsers.csv.CsvParser(settings)
-    read(new CsvRowIterator(parser.iterate(file).iterator()), header)
+    new com.univocity.parsers.csv.CsvParser(settings)
   }
 }

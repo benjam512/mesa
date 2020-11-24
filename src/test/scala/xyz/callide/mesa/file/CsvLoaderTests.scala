@@ -29,13 +29,24 @@ class CsvLoaderTests extends FlatSpec with FileTest {
 
     testCompleteFile(CsvLoader.readFromPath(getClass.getClassLoader.getResource("data.csv").getFile)(ConversionSet()))
     testPartialFile(CsvLoader.readFromPath(getClass.getClassLoader.getResource("data5.csv").getFile)(ConversionSet()))
-    testCompleteFile(CsvLoader.readFromFile(new File(getClass.getClassLoader.getResource("data.csv").toURI), ',', true)(ConversionSet()))
-    testPartialFile(CsvLoader.readFromFile(new File(getClass.getClassLoader.getResource("data5.csv").toURI), ',', true)(ConversionSet()))
+    testCompleteFile(CsvLoader.readFromFile(new File(getClass.getClassLoader.getResource("data.csv").toURI), ',', true, None)(ConversionSet()))
+    testPartialFile(CsvLoader.readFromFile(new File(getClass.getClassLoader.getResource("data5.csv").toURI), ',', true, None)(ConversionSet()))
   }
 
   it should "read from stream" in {
 
     testCompleteFile(CsvLoader.readFromStream(getClass.getClassLoader.getResourceAsStream("data.csv"))(ConversionSet()))
     testPartialFile(CsvLoader.readFromStream(getClass.getClassLoader.getResourceAsStream("data5.csv"))(ConversionSet()))
+  }
+
+  it should "read from file with comment markers" in {
+
+    val data1 = CsvLoader.readFromPath(getClass.getClassLoader.getResource("data6.csv").getFile)(ConversionSet())
+    assert(data1.count == 2)
+    assert(data1.row(1)[String]("Col-A") == "#!*")
+
+    val data2 = CsvLoader.readFromPath(getClass.getClassLoader.getResource("data6.csv").getFile, comment = Some('#'))(ConversionSet())
+    assert(data2.count == 1)
+    assert(data2.row(0)[String]("Col-A") == "ABC")
   }
 }
