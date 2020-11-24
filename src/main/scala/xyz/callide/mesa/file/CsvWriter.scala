@@ -43,10 +43,10 @@ case class CsvWriter(path: String, delimiter: Char, quote: Boolean) {
     try {
       val delim = delimiter.toString
       val names = data.header.fieldNames
-      writer.println((if (quote) names.map(name => "\"" + name + "\"") else names).mkString(delim))
+      writer.println((if (quote) names.map(placeInQuotes) else names).mkString(delim))
       data.rows.foreach(row => {
         val line = if (quote) {
-          names.map(name => "\"" + row[String](name) + "\"").mkString(delim)
+          names.map(name => placeInQuotes(row[String](name))).mkString(delim)
         } else names.map(name => row[String](name)).mkString(delim)
         writer.println(line)
       })
@@ -55,4 +55,6 @@ case class CsvWriter(path: String, delimiter: Char, quote: Boolean) {
       writer.close()
     }
   }
+
+  private def placeInQuotes(value: String): String = "\"\"" + value + "\"\""
 }
